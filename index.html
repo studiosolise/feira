@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="theme-color" content="#2d6a4f" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Feira" />
   <title>Feira</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -626,6 +630,10 @@
               }
             }
           });
+          // Migrate renamed categories
+          state.categories.forEach(c => {
+            if (c.name === 'Enlatados e milho') c.name = 'Enlatados';
+          });
           // Ensure new categories exist in saved state
           ensureNewCategories();
           return;
@@ -1143,6 +1151,15 @@
     'palmito': 'Enlatados',
     'cogumelo': 'Enlatados',
     'extrato': 'Enlatados',
+    'extrato de tomate': 'Enlatados',
+    'grao de bico': 'Enlatados', 'grão de bico': 'Enlatados',
+    'creme de milho': 'Enlatados',
+    'seleta': 'Enlatados',
+    'pate': 'Enlatados', 'patê': 'Enlatados',
+    'mackerel': 'Enlatados',
+    'salsicha': 'Enlatados',
+    'lula em lata': 'Enlatados',
+    'bacalhau em lata': 'Enlatados',
 
     // Frios e refrigerados
     'queijo': 'Frios e refrigerados',
@@ -1746,6 +1763,10 @@
   render();
 
 })();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 </body>
 </html>
