@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#2d6a4f" />
+  <title>Feira</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #2d6a4f;
+      --green-light: #d8f3dc;
+      --green-mid: #52b788;
+      --bg: #f4f4f5;
+      --card: #ffffff;
+      --border: #e4e4e7;
+      --text: #18181b;
+      --text-muted: #71717a;
+      --checked-bg: #f0f0f0;
+      --checked-text: #aaaaaa;
+      --header-h: 72px;
+      --fab-size: 56px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      background: var(--green);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    .header-left h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-left .counter {
+      font-size: 12px;
+      opacity: .85;
+      margin-top: 1px;
+    }
+
+    .header-right {
+      text-align: right;
+    }
+
+    .header-right .total-label {
+      font-size: 11px;
+      opacity: .8;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .header-right .total-value {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      position: fixed;
+      top: var(--header-h);
+      left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      gap: 8px;
+      z-index: 99;
+    }
+
+    .btn-clear {
+      flex: 1;
+      height: 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .btn-clear:active { background: #f4f4f5; }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      padding-top: calc(var(--header-h) + 57px);
+      padding-bottom: calc(var(--fab-size) + 48px + 68px + 16px);
+    }
+
+    /* ── CATEGORY ── */
+    .category {
+      margin: 12px 12px 0;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      height: 52px;
+      background: var(--cat-color, var(--green));
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .category-header:active { filter: brightness(.93); }
+
+    .category-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      flex: 1;
+    }
+
+    .category-badge {
+      background: rgba(255,255,255,.25);
+      color: #fff;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      margin-right: 10px;
+    }
+
+    .category-chevron {
+      color: #fff;
+      font-size: 18px;
+      transition: transform .2s;
+      display: inline-block;
+    }
+
+    .category.collapsed .category-chevron { transform: rotate(-90deg); }
+
+    .category-body {
+      background: var(--card);
+    }
+
+    .category.collapsed .category-body { display: none; }
+
+    /* ── PRODUCT ITEM ── */
+    .item {
+      display: grid;
+      grid-template-columns: 1fr 80px 90px;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      transition: background .2s, opacity .2s;
+      min-height: 56px;
+    }
+
+    .item:last-child { border-bottom: none; }
+
+    .item.checked {
+      background: var(--checked-bg);
+    }
+
+    .item-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .item.checked .item-name {
+      color: var(--checked-text);
+      text-decoration: line-through;
+    }
+
+    .check-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cat-color, var(--green));
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .check-icon svg { width: 13px; height: 13px; }
+
+    .item.checked .check-icon { display: flex; }
+
+    .name-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── INPUTS ── */
+    .item input[type="text"] {
+      width: 100%;
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      text-align: center;
+      outline: none;
+      transition: border-color .15s;
+      -webkit-appearance: none;
+    }
+
+    .item input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
+    }
+
+    .item.checked input {
+      background: #e8e8e8;
+      color: #aaa;
+      border-color: #ddd;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-label {
+      position: absolute;
+      top: -9px;
+      left: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: #fff;
+      padding: 0 3px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .item.checked .input-label { background: var(--checked-bg); }
+
+    /* ── BOTTOM BAR ── */
+    #bottom-bar {
+      position: fixed;
+      bottom: calc(var(--fab-size) + 24px + 16px);
+      left: 0; right: 0;
+      background: #fff;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.10);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 150;
+    }
+
+    #bottom-bar-input {
+      flex: 1;
+      height: 48px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text);
+      background: #f8f8f9;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    #bottom-bar-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    #bottom-bar-input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
+      background: #fff;
+    }
+
+    #bottom-bar-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      background: var(--green);
+      color: #fff;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: filter .15s, transform .1s;
+    }
+
+    #bottom-bar-btn:active {
+      filter: brightness(.88);
+      transform: scale(.94);
+    }
+
+    /* ── FAB ── */
+    #fab {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: var(--fab-size);
+      height: var(--fab-size);
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(45,106,79,.45);
+      z-index: 200;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    #fab:active {
+      transform: scale(.92);
+      box-shadow: 0 2px 8px rgba(45,106,79,.35);
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 300;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: #fff;
+      width: 100%;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 20px 40px;
+      transform: translateY(100%);
+      transition: transform .25s cubic-bezier(.32,.72,0,1);
+    }
+
+    .overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: #ddd;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .modal h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .form-field {
+      margin-bottom: 16px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-field input {
+      width: 100%;
+      height: 48px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-field input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
+    }
+
+    .btn-add-category {
+      width: 100%;
+      height: 52px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: filter .15s;
+    }
+
+    .btn-add-category:active { filter: brightness(.9); }
+
+    /* ── CONFIRM MODAL ── */
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .confirm-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .confirm-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px 20px 20px;
+      width: 100%;
+      max-width: 320px;
+      transform: scale(.9);
+      transition: transform .2s;
+    }
+
+    .confirm-overlay.open .confirm-box { transform: scale(1); }
+
+    .confirm-box h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .confirm-box p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .confirm-actions button {
+      flex: 1;
+      height: 46px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel { background: #f4f4f5; color: var(--text); }
+    .btn-confirm { background: #ef4444; color: #fff; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg { opacity: .3; margin-bottom: 12px; }
+    .empty-state p { font-size: 15px; }
+
+    @media (min-width: 480px) {
+      .category { margin: 12px 16px 0; }
+      main { padding-top: calc(var(--header-h) + 57px); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Feira</h1>
+    <div class="counter" id="counter">0 de 0 itens pegos</div>
+  </div>
+  <div class="header-right">
+    <div class="total-label">Total</div>
+    <div class="total-value" id="total">R$ 0,00</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <button class="btn-clear" id="btn-clear">Limpar valores</button>
+</div>
+
+<main id="list-root"></main>
+
+<!-- Barra fixa de adição rápida -->
+<div id="bottom-bar">
+  <input
+    type="text"
+    id="bottom-bar-input"
+    placeholder="Adicionar produto..."
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="words"
+  />
+  <button id="bottom-bar-btn" aria-label="Adicionar produto">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+<button id="fab" aria-label="Adicionar categoria">+</button>
+
+<!-- Modal adicionar categoria -->
+<div class="overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Nova categoria</h2>
+    <div class="form-field">
+      <label for="inp-cat-name">Nome da categoria</label>
+      <input type="text" id="inp-cat-name" placeholder="Ex: Hortifruti" autocomplete="off" />
+    </div>
+    <button class="btn-add-category" id="btn-add-category">Criar categoria</button>
+  </div>
+</div>
+
+<!-- Modal confirmar limpeza -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>Limpar valores?</h3>
+    <p>Os campos de quantidade e preço serão apagados. Os produtos permanecem na lista.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="btn-cancel-clear">Cancelar</button>
+      <button class="btn-confirm" id="btn-confirm-clear">Limpar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ─── CATEGORY COLOR PALETTE ─────────────────────────────────────
+  const CAT_COLORS = [
+    '#2d6a4f', // verde escuro
+    '#1d6fa4', // azul
+    '#7b4fa4', // roxo
+    '#c05621', // laranja escuro
+    '#a4752d', // dourado
+    '#c0392b', // vermelho
+    '#1a7a6e', // teal
+    '#5c3a8a', // violeta
+    '#2e7d8a', // azul petróleo
+    '#7a4a2d', // marrom
+    '#4a7a2d'  // verde oliva
+  ];
+
+  function getCatColor(index, catName) {
+    if (catName === 'Sem categoria') return '#888888';
+    return CAT_COLORS[index % CAT_COLORS.length];
+  }
+
+  // ─── DEFAULT DATA ───────────────────────────────────────────────
+  const DEFAULT_CATEGORIES = [
+    {
+      id: 'limpeza',
+      name: 'Limpeza da casa',
+      items: ['Sabão em pó','Amaciante','Água sanitária','Detergente','Desinfetante','Percarbonato de sódio','Gel sanitário para vaso','Aromatizador de ambientes','Bombril','Veja multiuso','Álcool']
+    },
+    {
+      id: 'papeis',
+      name: 'Papéis, descartáveis e utilidades',
+      items: ['Papel toalha','Papel higiênico','Saco plástico']
+    },
+    {
+      id: 'higiene',
+      name: 'Higiene pessoal',
+      items: ['Escova de dente','Gilete','Prestobarba','Sabonete','Shampoo','Condicionador','Desodorante spray','Desodorante aerosol','Desodorante Herbíssimo','Cotonete','Absorvente','Lenço umedecido']
+    },
+    {
+      id: 'cafe',
+      name: 'Café da manhã e bebidas',
+      items: ['Café','Leite em pó','Leite','Toddy']
+    },
+    {
+      id: 'biscoitos',
+      name: 'Biscoitos e bolachas',
+      items: ['Bolacha maizena','Bolacha cream cracker','Bolacha de coco','Bolacha de leite']
+    },
+    {
+      id: 'mercearia',
+      name: 'Mercearia básica',
+      items: ['Macarrão','Açúcar','Feijão','Miojo']
+    },
+    {
+      id: 'temperos',
+      name: 'Temperos, molhos e condimentos',
+      items: ['Ajinomoto','Sal de parrilla','Azeite','Molho de tomate','Maionese','Azeitona']
+    },
+    {
+      id: 'enlatados',
+      name: 'Enlatados e milho',
+      items: ['Milho','Milho de pipoca']
+    },
+    {
+      id: 'frios',
+      name: 'Frios e refrigerados',
+      items: ['Bacon','Calabresa','Presunto','Queijo','Iogurte','Margarina','Requeijão']
+    },
+    {
+      id: 'padaria',
+      name: 'Padaria',
+      items: ['Pão de forma']
+    },
+    {
+      id: 'acougue',
+      name: 'Açougue e carnes',
+      items: ['Coração de galinha','Filé de peito','Coxinha da asa']
+    }
+  ];
+
+  // ─── STATE ──────────────────────────────────────────────────────
+  // products.price is stored in centavos (integer), '' when empty
+  // products.qty is stored as string (number or '')
+  let state = {
+    categories: [],   // [{id, name, collapsed}]
+    products: [],     // [{id, name, catId, qty, price}]
+    nextId: 1
+  };
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem('feira_state');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.categories && parsed.products) {
+          state = parsed;
+          // Migrate old price format (decimal string → centavos integer)
+          state.products.forEach(p => {
+            if (p.price !== '' && p.price !== null && p.price !== undefined) {
+              const v = p.price;
+              if (typeof v === 'string' && v !== '') {
+                // old format was decimal string like "9.99" or "9,99"
+                const clean = v.replace(',', '.');
+                const num = parseFloat(clean);
+                if (!isNaN(num)) {
+                  p.price = Math.round(num * 100);
+                } else {
+                  p.price = '';
+                }
+              }
+              // if already integer, keep as-is
+            }
+          });
+          return;
+        }
+      }
+    } catch (e) { /* ignore */ }
+    // init from defaults
+    state.categories = DEFAULT_CATEGORIES.map(c => ({ id: c.id, name: c.name, collapsed: false }));
+    state.products = [];
+    let pid = 1;
+    DEFAULT_CATEGORIES.forEach(c => {
+      c.items.forEach(name => {
+        state.products.push({ id: pid++, name, catId: c.id, qty: '', price: '' });
+      });
+    });
+    state.nextId = pid;
+    saveState();
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem('feira_state', JSON.stringify(state));
+    } catch (e) { /* ignore */ }
+  }
+
+  // ─── PRICE MASK HELPERS ─────────────────────────────────────────
+  // price stored internally as integer centavos ('' when empty)
+
+  function centavosToDisplay(centavos) {
+    // centavos: integer or ''
+    if (centavos === '' || centavos === null || centavos === undefined) return '';
+    const n = parseInt(centavos, 10);
+    if (isNaN(n) || n === 0) return '';
+    const reais = Math.floor(n / 100);
+    const cents = n % 100;
+    return reais + ',' + String(cents).padStart(2, '0');
+  }
+
+  function applyPriceMask(rawValue) {
+    // rawValue: current input string (may contain digits, comma, dot, etc.)
+    // returns {display: string, centavos: int|''}
+    const digits = rawValue.replace(/\D/g, '');
+    if (digits === '' || digits === '0') return { display: '', centavos: '' };
+    const n = parseInt(digits, 10);
+    if (isNaN(n) || n === 0) return { display: '', centavos: '' };
+    const reais = Math.floor(n / 100);
+    const cents = n % 100;
+    const display = reais + ',' + String(cents).padStart(2, '0');
+    return { display, centavos: n };
+  }
+
+  // ─── OTHER HELPERS ───────────────────────────────────────────────
+  function parseQty(v) {
+    if (v === '' || v === null || v === undefined) return 0;
+    const s = String(v).replace(',', '.');
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function formatBRL(centavos) {
+    // centavos: integer
+    const n = centavos / 100;
+    return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function genId(prefix) {
+    return prefix + '_' + (state.nextId++);
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ─── RENDER ─────────────────────────────────────────────────────
+  const root = document.getElementById('list-root');
+
+  function render() {
+    root.innerHTML = '';
+
+    // "Sem categoria" sempre no final
+    const sortedCats = [
+      ...state.categories.filter(c => c.name !== 'Sem categoria'),
+      ...state.categories.filter(c => c.name === 'Sem categoria')
+    ];
+
+    sortedCats.forEach((cat, catIndex) => {
+      const prods = state.products.filter(p => p.catId === cat.id);
+      // Não renderiza "Sem categoria" se estiver vazia
+      if (cat.name === 'Sem categoria' && prods.length === 0) return;
+      const catColor = getCatColor(catIndex, cat.name);
+
+      const checkedCount = prods.filter(p => p.price !== '' && p.price > 0).length;
+
+      const section = document.createElement('div');
+      section.className = 'category' + (cat.collapsed ? ' collapsed' : '');
+      section.dataset.catId = cat.id;
+      section.style.setProperty('--cat-color', catColor);
+
+      section.innerHTML = `
+        <div class="category-header" data-cat-header="${cat.id}" style="background:${catColor}">
+          <span class="category-title">${escapeHtml(cat.name)}</span>
+          <span class="category-badge">${checkedCount}/${prods.length}</span>
+          <span class="category-chevron">&#8964;</span>
+        </div>
+        <div class="category-body" id="cat-body-${cat.id}"></div>
+      `;
+
+      const body = section.querySelector('.category-body');
+
+      prods.forEach(prod => {
+        const isChecked = prod.price !== '' && prod.price > 0;
+        const itemEl = document.createElement('div');
+        itemEl.className = 'item' + (isChecked ? ' checked' : '');
+        itemEl.dataset.prodId = prod.id;
+
+        const displayPrice = centavosToDisplay(prod.price);
+
+        itemEl.innerHTML = `
+          <div class="item-name">
+            <span class="check-icon" style="background:${catColor}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </span>
+            <span class="name-text" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</span>
+          </div>
+          <div class="input-wrap">
+            <span class="input-label">Qtd</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              placeholder="0"
+              value="${escapeHtml(String(prod.qty))}"
+              data-field="qty"
+              data-id="${prod.id}"
+              autocomplete="off"
+            />
+          </div>
+          <div class="input-wrap">
+            <span class="input-label">Preço R$</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              placeholder="0,00"
+              value="${escapeHtml(displayPrice)}"
+              data-field="price"
+              data-id="${prod.id}"
+              autocomplete="off"
+            />
+          </div>
+        `;
+
+        body.appendChild(itemEl);
+      });
+
+      root.appendChild(section);
+    });
+
+    // empty state
+    if (root.children.length === 0) {
+      root.innerHTML = `<div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Nenhuma categoria ainda.<br>Toque no + para adicionar.</p>
+      </div>`;
+    }
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    let totalCentavos = 0;
+    let checked = 0;
+    const allCount = state.products.length;
+
+    state.products.forEach(p => {
+      const price = (p.price !== '' && p.price !== null && p.price !== undefined) ? parseInt(p.price, 10) : 0;
+      if (price > 0) {
+        const qty = parseQty(p.qty);
+        const effectiveQty = qty > 0 ? qty : 1;
+        totalCentavos += price * effectiveQty;
+        checked++;
+      }
+    });
+
+    document.getElementById('total').textContent = formatBRL(totalCentavos);
+    document.getElementById('counter').textContent = `${checked} de ${allCount} itens pegos`;
+  }
+
+  // Lightweight partial update: just update item class + summary (no full re-render)
+  function patchItemUI(prodId) {
+    const prod = state.products.find(p => p.id === prodId);
+    if (!prod) return;
+    const itemEl = root.querySelector(`.item[data-prod-id="${prodId}"]`);
+    if (!itemEl) return;
+    const isChecked = prod.price !== '' && prod.price > 0;
+    if (isChecked) itemEl.classList.add('checked');
+    else itemEl.classList.remove('checked');
+
+    // update badge for category
+    const catForBadge = state.categories.find(c => c.id === prod.catId);
+    if (catForBadge) {
+      const prods = state.products.filter(p => p.catId === catForBadge.id);
+      const cc = prods.filter(p => p.price !== '' && p.price > 0).length;
+      const badge = root.querySelector(`.category[data-cat-id="${catForBadge.id}"] .category-badge`);
+      if (badge) badge.textContent = `${cc}/${prods.length}`;
+    }
+
+    updateSummary();
+  }
+
+  // ─── PRODUCT DICTIONARY ──────────────────────────────────────────
+  const PRODUCT_DICT = {
+    // Mercearia básica
+    'arroz': 'Mercearia básica',
+    'feijao': 'Mercearia básica', 'feijão': 'Mercearia básica',
+    'macarrao': 'Mercearia básica', 'macarrão': 'Mercearia básica', 'massa': 'Mercearia básica', 'espaguete': 'Mercearia básica', 'fusilli': 'Mercearia básica', 'penne': 'Mercearia básica',
+    'acucar': 'Mercearia básica', 'açúcar': 'Mercearia básica',
+    'miojo': 'Mercearia básica', 'lamen': 'Mercearia básica', 'lámen': 'Mercearia básica',
+    'farinha': 'Mercearia básica', 'amido': 'Mercearia básica', 'fuba': 'Mercearia básica', 'fubá': 'Mercearia básica',
+    'aveia': 'Mercearia básica', 'granola': 'Mercearia básica',
+    'lentilha': 'Mercearia básica', 'grao': 'Mercearia básica', 'grão': 'Mercearia básica', 'ervilha seca': 'Mercearia básica',
+    'tapioca': 'Mercearia básica',
+
+    // Temperos, molhos e condimentos
+    'sal': 'Temperos, molhos e condimentos',
+    'pimenta': 'Temperos, molhos e condimentos',
+    'alho': 'Temperos, molhos e condimentos',
+    'cebola': 'Temperos, molhos e condimentos',
+    'azeite': 'Temperos, molhos e condimentos',
+    'oleo': 'Temperos, molhos e condimentos', 'óleo': 'Temperos, molhos e condimentos',
+    'vinagre': 'Temperos, molhos e condimentos',
+    'molho': 'Temperos, molhos e condimentos',
+    'ketchup': 'Temperos, molhos e condimentos',
+    'mostarda': 'Temperos, molhos e condimentos',
+    'maionese': 'Temperos, molhos e condimentos',
+    'azeitona': 'Temperos, molhos e condimentos',
+    'tempero': 'Temperos, molhos e condimentos',
+    'ajinomoto': 'Temperos, molhos e condimentos',
+    'shoyu': 'Temperos, molhos e condimentos', 'soja molho': 'Temperos, molhos e condimentos',
+    'curry': 'Temperos, molhos e condimentos',
+    'canela': 'Temperos, molhos e condimentos',
+    'oregano': 'Temperos, molhos e condimentos', 'orégano': 'Temperos, molhos e condimentos',
+    'louro': 'Temperos, molhos e condimentos',
+    'colorau': 'Temperos, molhos e condimentos',
+    'páprica': 'Temperos, molhos e condimentos', 'paprica': 'Temperos, molhos e condimentos',
+    'chimichurri': 'Temperos, molhos e condimentos',
+    'parrilla': 'Temperos, molhos e condimentos',
+
+    // Enlatados e milho
+    'milho': 'Enlatados e milho',
+    'pipoca': 'Enlatados e milho',
+    'atum': 'Enlatados e milho',
+    'sardinha': 'Enlatados e milho',
+    'ervilha': 'Enlatados e milho',
+    'palmito': 'Enlatados e milho',
+    'cogumelo': 'Enlatados e milho',
+    'extrato': 'Enlatados e milho',
+
+    // Frios e refrigerados
+    'queijo': 'Frios e refrigerados',
+    'presunto': 'Frios e refrigerados',
+    'mortadela': 'Frios e refrigerados',
+    'salame': 'Frios e refrigerados',
+    'bacon': 'Frios e refrigerados',
+    'calabresa': 'Frios e refrigerados',
+    'linguica': 'Frios e refrigerados', 'linguiça': 'Frios e refrigerados',
+    'iogurte': 'Frios e refrigerados',
+    'margarina': 'Frios e refrigerados',
+    'manteiga': 'Frios e refrigerados',
+    'requeijao': 'Frios e refrigerados', 'requeijão': 'Frios e refrigerados',
+    'creme de leite': 'Frios e refrigerados',
+    'leite condensado': 'Frios e refrigerados',
+    'mussarela': 'Frios e refrigerados',
+    'parmesao': 'Frios e refrigerados', 'parmesão': 'Frios e refrigerados',
+    'peito de peru': 'Frios e refrigerados',
+    'ovo': 'Frios e refrigerados',
+    'ova': 'Frios e refrigerados',
+
+    // Açougue e carnes
+    'frango': 'Açougue e carnes',
+    'galinha': 'Açougue e carnes',
+    'coxinha': 'Açougue e carnes',
+    'coração': 'Açougue e carnes', 'coracao': 'Açougue e carnes',
+    'file': 'Açougue e carnes', 'filé': 'Açougue e carnes',
+    'peito': 'Açougue e carnes',
+    'carne': 'Açougue e carnes',
+    'picanha': 'Açougue e carnes',
+    'alcatra': 'Açougue e carnes',
+    'patinho': 'Açougue e carnes',
+    'musculo': 'Açougue e carnes', 'músculo': 'Açougue e carnes',
+    'costela': 'Açougue e carnes',
+    'contrafile': 'Açougue e carnes', 'contrafilé': 'Açougue e carnes',
+    'acém': 'Açougue e carnes', 'acem': 'Açougue e carnes',
+    'bife': 'Açougue e carnes',
+    'pork': 'Açougue e carnes',
+    'porco': 'Açougue e carnes',
+    'bisteca': 'Açougue e carnes',
+    'asa': 'Açougue e carnes',
+    'sobrecoxa': 'Açougue e carnes',
+    'coxa': 'Açougue e carnes',
+    'peixe': 'Açougue e carnes',
+    'tilapia': 'Açougue e carnes', 'tilápia': 'Açougue e carnes',
+    'salmao': 'Açougue e carnes', 'salmão': 'Açougue e carnes',
+
+    // Café da manhã e bebidas
+    'cafe': 'Café da manhã e bebidas', 'café': 'Café da manhã e bebidas',
+    'leite': 'Café da manhã e bebidas',
+    'toddy': 'Café da manhã e bebidas',
+    'nescau': 'Café da manhã e bebidas',
+    'achocolatado': 'Café da manhã e bebidas',
+    'suco': 'Café da manhã e bebidas',
+    'nectar': 'Café da manhã e bebidas', 'néctar': 'Café da manhã e bebidas',
+    'cha': 'Café da manhã e bebidas', 'chá': 'Café da manhã e bebidas',
+    'refrigerante': 'Café da manhã e bebidas',
+    'coca': 'Café da manhã e bebidas',
+    'pepsi': 'Café da manhã e bebidas',
+    'agua': 'Café da manhã e bebidas', 'água': 'Café da manhã e bebidas',
+    'cerveja': 'Café da manhã e bebidas',
+    'vinho': 'Café da manhã e bebidas',
+    'capuccino': 'Café da manhã e bebidas', 'cappuccino': 'Café da manhã e bebidas',
+    'mate': 'Café da manhã e bebidas',
+
+    // Biscoitos e bolachas
+    'bolacha': 'Biscoitos e bolachas',
+    'biscoito': 'Biscoitos e bolachas',
+    'cookie': 'Biscoitos e bolachas',
+    'wafer': 'Biscoitos e bolachas',
+    'cream cracker': 'Biscoitos e bolachas',
+    'maizena': 'Biscoitos e bolachas',
+    'rosquinha': 'Biscoitos e bolachas',
+    'sequilho': 'Biscoitos e bolachas',
+    'crackers': 'Biscoitos e bolachas',
+
+    // Padaria
+    'pao': 'Padaria', 'pão': 'Padaria',
+    'bolo': 'Padaria',
+    'torrada': 'Padaria',
+    'broa': 'Padaria',
+    'croissant': 'Padaria',
+    'brioche': 'Padaria',
+    'forma': 'Padaria',
+
+    // Limpeza da casa
+    'sabao': 'Limpeza da casa', 'sabão': 'Limpeza da casa',
+    'amaciante': 'Limpeza da casa',
+    'sanitaria': 'Limpeza da casa', 'sanitária': 'Limpeza da casa',
+    'detergente': 'Limpeza da casa',
+    'desinfetante': 'Limpeza da casa',
+    'percarbonato': 'Limpeza da casa',
+    'veja': 'Limpeza da casa',
+    'multiuso': 'Limpeza da casa',
+    'limpador': 'Limpeza da casa',
+    'bombril': 'Limpeza da casa',
+    'esponja': 'Limpeza da casa',
+    'alcool': 'Limpeza da casa', 'álcool': 'Limpeza da casa',
+    'aromatizador': 'Limpeza da casa',
+    'gel sanitario': 'Limpeza da casa', 'gel sanitário': 'Limpeza da casa',
+    'pastilha': 'Limpeza da casa',
+    'inseticida': 'Limpeza da casa',
+    'repelente': 'Limpeza da casa',
+    'tira manchas': 'Limpeza da casa',
+    'vanish': 'Limpeza da casa',
+    'cif': 'Limpeza da casa',
+    'pinho sol': 'Limpeza da casa',
+
+    // Papéis, descartáveis e utilidades
+    'papel': 'Papéis, descartáveis e utilidades',
+    'toalha': 'Papéis, descartáveis e utilidades',
+    'higienico': 'Papéis, descartáveis e utilidades', 'higiênico': 'Papéis, descartáveis e utilidades',
+    'saco': 'Papéis, descartáveis e utilidades',
+    'plastico': 'Papéis, descartáveis e utilidades', 'plástico': 'Papéis, descartáveis e utilidades',
+    'sacola': 'Papéis, descartáveis e utilidades',
+    'guardanapo': 'Papéis, descartáveis e utilidades',
+    'copo descartavel': 'Papéis, descartáveis e utilidades',
+    'prato descartavel': 'Papéis, descartáveis e utilidades',
+    'papel aluminio': 'Papéis, descartáveis e utilidades',
+    'papel manteiga': 'Papéis, descartáveis e utilidades',
+    'filme plastico': 'Papéis, descartáveis e utilidades',
+
+    // Higiene pessoal
+    'sabonete': 'Higiene pessoal',
+    'shampoo': 'Higiene pessoal', 'xampu': 'Higiene pessoal',
+    'condicionador': 'Higiene pessoal',
+    'creme': 'Higiene pessoal',
+    'hidratante': 'Higiene pessoal',
+    'desodorante': 'Higiene pessoal',
+    'escova': 'Higiene pessoal',
+    'pasta': 'Higiene pessoal',
+    'creme dental': 'Higiene pessoal',
+    'fio dental': 'Higiene pessoal',
+    'gilete': 'Higiene pessoal',
+    'barbeador': 'Higiene pessoal',
+    'prestobarba': 'Higiene pessoal',
+    'absorvente': 'Higiene pessoal',
+    'cotonete': 'Higiene pessoal',
+    'lenco': 'Higiene pessoal', 'lenço': 'Higiene pessoal',
+    'umedecido': 'Higiene pessoal',
+    'algodao': 'Higiene pessoal', 'algodão': 'Higiene pessoal',
+    'perfume': 'Higiene pessoal',
+    'protetor solar': 'Higiene pessoal',
+    'maquiagem': 'Higiene pessoal',
+    'batom': 'Higiene pessoal',
+    'removedor': 'Higiene pessoal',
+    'herbissimo': 'Higiene pessoal', 'herbíssimo': 'Higiene pessoal',
+  };
+
+  // ─── CATEGORY MATCHING ───────────────────────────────────────────
+  function normalizeStr(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .trim();
+  }
+
+  function guessCategory(productName) {
+    const norm = normalizeStr(productName);
+    // Tenta match exato primeiro
+    for (const [key, cat] of Object.entries(PRODUCT_DICT)) {
+      if (normalizeStr(key) === norm) return cat;
+    }
+    // Depois tenta "input contém a chave" ou "chave contém o input"
+    for (const [key, cat] of Object.entries(PRODUCT_DICT)) {
+      const normKey = normalizeStr(key);
+      if (norm.includes(normKey) || normKey.includes(norm)) return cat;
+    }
+    return 'Sem categoria';
+  }
+
+  // ─── ENSURE "SEM CATEGORIA" EXISTS ──────────────────────────────
+  function ensureSemCategoria() {
+    const exists = state.categories.find(c => c.name === 'Sem categoria');
+    if (!exists) {
+      state.categories.push({ id: 'sem_categoria', name: 'Sem categoria', collapsed: false });
+    }
+  }
+
+  // ─── ADD PRODUCT VIA BOTTOM BAR ─────────────────────────────────
+  function addProductFromBottomBar(productName) {
+    const trimmed = productName.trim();
+    if (!trimmed) return;
+
+    const categoryName = guessCategory(trimmed);
+
+    // Garante categoria "Sem categoria" se necessário
+    if (categoryName === 'Sem categoria') {
+      ensureSemCategoria();
+    }
+
+    // Encontra a categoria pelo nome
+    let cat = state.categories.find(c => c.name === categoryName);
+    if (!cat) {
+      // Fallback: cria "Sem categoria" se algo correu mal
+      ensureSemCategoria();
+      cat = state.categories.find(c => c.name === 'Sem categoria');
+    }
+
+    // Se a categoria estava colapsada, expande
+    if (cat.collapsed) {
+      cat.collapsed = false;
+    }
+
+    const prod = { id: state.nextId++, name: trimmed, catId: cat.id, qty: '', price: '' };
+    state.products.push(prod);
+    saveState();
+    render();
+
+    // Scroll até o novo item
+    setTimeout(() => {
+      const el = root.querySelector(`.item[data-prod-id="${prod.id}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
+  }
+
+  // ─── EVENT DELEGATION ────────────────────────────────────────────
+  root.addEventListener('click', e => {
+    // category toggle
+    const header = e.target.closest('[data-cat-header]');
+    if (header) {
+      const catId = header.dataset.catHeader;
+      const cat = state.categories.find(c => c.id === catId);
+      if (cat) {
+        cat.collapsed = !cat.collapsed;
+        const section = root.querySelector(`.category[data-cat-id="${catId}"]`);
+        if (section) section.classList.toggle('collapsed', cat.collapsed);
+        saveState();
+      }
+    }
+  });
+
+  root.addEventListener('input', e => {
+    // product field inputs
+    const inp = e.target.closest('input[data-field]');
+    if (!inp) return;
+
+    const id = parseInt(inp.dataset.id, 10);
+    const field = inp.dataset.field;
+    const prod = state.products.find(p => p.id === id);
+    if (!prod) return;
+
+    if (field === 'price') {
+      const { display, centavos } = applyPriceMask(inp.value);
+      // Only update DOM value if it changed to avoid cursor jumps
+      if (inp.value !== display) inp.value = display;
+      prod.price = centavos;
+    } else {
+      prod[field] = inp.value;
+    }
+
+    saveState();
+    patchItemUI(id);
+  });
+
+  // ─── BOTTOM BAR LISTENERS ────────────────────────────────────────
+  const bottomInput = document.getElementById('bottom-bar-input');
+  const bottomBtn   = document.getElementById('bottom-bar-btn');
+
+  function submitBottomBar() {
+    const val = bottomInput.value;
+    if (!val.trim()) return;
+    addProductFromBottomBar(val);
+    bottomInput.value = '';
+    bottomInput.focus();
+  }
+
+  bottomBtn.addEventListener('click', submitBottomBar);
+
+  bottomInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitBottomBar();
+    }
+  });
+
+  // ─── CLEAR ──────────────────────────────────────────────────────
+  const confirmOverlay = document.getElementById('confirm-overlay');
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    confirmOverlay.classList.add('open');
+  });
+
+  document.getElementById('btn-cancel-clear').addEventListener('click', () => {
+    confirmOverlay.classList.remove('open');
+  });
+
+  document.getElementById('btn-confirm-clear').addEventListener('click', () => {
+    confirmOverlay.classList.remove('open');
+    state.products.forEach(p => { p.qty = ''; p.price = ''; });
+    saveState();
+    render();
+  });
+
+  confirmOverlay.addEventListener('click', e => {
+    if (e.target === confirmOverlay) confirmOverlay.classList.remove('open');
+  });
+
+  // ─── ADD CATEGORY MODAL ─────────────────────────────────────────
+  const overlay = document.getElementById('modal-overlay');
+  const inpCatName = document.getElementById('inp-cat-name');
+
+  document.getElementById('fab').addEventListener('click', () => {
+    inpCatName.value = '';
+    overlay.classList.add('open');
+    setTimeout(() => inpCatName.focus(), 300);
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+
+  document.getElementById('btn-add-category').addEventListener('click', () => {
+    const name = inpCatName.value.trim();
+    if (!name) {
+      inpCatName.focus();
+      inpCatName.style.borderColor = '#ef4444';
+      setTimeout(() => inpCatName.style.borderColor = '', 1500);
+      return;
+    }
+
+    const catId = genId('cat');
+    state.categories.push({ id: catId, name, collapsed: false });
+    saveState();
+    overlay.classList.remove('open');
+    render();
+
+    // scroll to new category
+    setTimeout(() => {
+      const el = root.querySelector(`.category[data-cat-id="${catId}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  });
+
+  inpCatName.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-add-category').click();
+  });
+
+  // ─── INIT ────────────────────────────────────────────────────────
+  loadState();
+  render();
+
+})();
+</script>
+</body>
+</html>
