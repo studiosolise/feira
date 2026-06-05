@@ -20,7 +20,8 @@
       --checked-bg: #f0f0f0;
       --checked-text: #aaaaaa;
       --header-h: 72px;
-      --fab-size: 56px;
+      --search-h: 52px;
+      --bottom-bar-h: 70px;
     }
 
     html, body {
@@ -75,39 +76,63 @@
       letter-spacing: -0.5px;
     }
 
-    /* ── TOOLBAR ── */
-    .toolbar {
+    /* ── SEARCH BAR ── */
+    #search-bar {
       position: fixed;
       top: var(--header-h);
       left: 0; right: 0;
+      height: var(--search-h);
       background: #fff;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      padding: 8px 12px;
+      padding: 0 12px;
       gap: 8px;
       z-index: 99;
     }
 
-    .btn-clear {
-      flex: 1;
-      height: 40px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
+    #search-bar .search-icon {
       color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background .15s, color .15s;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
 
-    .btn-clear:active { background: #f4f4f5; }
+    #search-input {
+      flex: 1;
+      height: 36px;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    #search-input::placeholder { color: var(--text-muted); }
+
+    #search-clear {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #e4e4e7;
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #search-clear.visible { display: flex; }
 
     /* ── MAIN CONTENT ── */
     main {
-      padding-top: calc(var(--header-h) + 57px);
-      padding-bottom: calc(var(--fab-size) + 48px + 68px + 16px);
+      padding-top: calc(var(--header-h) + var(--search-h));
+      padding-bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px) + 32px);
     }
 
     /* ── CATEGORY ── */
@@ -166,6 +191,8 @@
 
     /* ── PRODUCT ITEM ── */
     .item {
+      position: relative;
+      overflow: hidden;
       display: grid;
       grid-template-columns: 1fr 80px 90px;
       align-items: center;
@@ -180,6 +207,32 @@
 
     .item.checked {
       background: var(--checked-bg);
+    }
+
+    /* ── SWIPE DELETE ── */
+    .item-content {
+      display: contents;
+    }
+
+    .item-delete-bg {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 80px;
+      background: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+
+    .item-delete-bg.visible { opacity: 1; }
+
+    .item-inner {
+      display: contents;
     }
 
     .item-name {
@@ -266,40 +319,40 @@
     /* ── BOTTOM BAR ── */
     #bottom-bar {
       position: fixed;
-      bottom: calc(var(--fab-size) + 24px + 16px);
+      bottom: 0;
       left: 0; right: 0;
-      background: #fff;
-      box-shadow: 0 -2px 12px rgba(0,0,0,.10);
+      background: #1a2e1e;
+      box-shadow: 0 -2px 16px rgba(0,0,0,.35);
       padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 150;
+      z-index: 200;
     }
 
     #bottom-bar-input {
       flex: 1;
       height: 48px;
-      border: 1.5px solid var(--border);
+      border: 1.5px solid #3a5a3a;
       border-radius: 14px;
       padding: 0 16px;
       font-size: 16px;
       font-family: inherit;
-      color: var(--text);
-      background: #f8f8f9;
+      color: #fff;
+      background: #2d2d2d;
       outline: none;
       -webkit-appearance: none;
       transition: border-color .15s, box-shadow .15s;
     }
 
     #bottom-bar-input::placeholder {
-      color: var(--text-muted);
+      color: #aaa;
     }
 
     #bottom-bar-input:focus {
       border-color: var(--green-mid);
-      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
-      background: #fff;
+      box-shadow: 0 0 0 3px rgba(82,183,136,.25);
     }
 
     #bottom-bar-btn {
@@ -322,126 +375,6 @@
       filter: brightness(.88);
       transform: scale(.94);
     }
-
-    /* ── FAB ── */
-    #fab {
-      position: fixed;
-      bottom: 24px;
-      right: 20px;
-      width: var(--fab-size);
-      height: var(--fab-size);
-      border-radius: 50%;
-      background: var(--green);
-      color: #fff;
-      border: none;
-      font-size: 28px;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(45,106,79,.45);
-      z-index: 200;
-      transition: transform .15s, box-shadow .15s;
-    }
-
-    #fab:active {
-      transform: scale(.92);
-      box-shadow: 0 2px 8px rgba(45,106,79,.35);
-    }
-
-    /* ── MODAL ── */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      z-index: 300;
-      display: flex;
-      align-items: flex-end;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s;
-    }
-
-    .overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal {
-      background: #fff;
-      width: 100%;
-      border-radius: 20px 20px 0 0;
-      padding: 20px 20px 40px;
-      transform: translateY(100%);
-      transition: transform .25s cubic-bezier(.32,.72,0,1);
-    }
-
-    .overlay.open .modal {
-      transform: translateY(0);
-    }
-
-    .modal-handle {
-      width: 40px; height: 4px;
-      background: #ddd;
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
-
-    .modal h2 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--text);
-    }
-
-    .form-field {
-      margin-bottom: 16px;
-    }
-
-    .form-field label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .form-field input {
-      width: 100%;
-      height: 48px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 0 14px;
-      font-size: 16px;
-      font-family: inherit;
-      color: var(--text);
-      background: #fff;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .form-field input:focus {
-      border-color: var(--green-mid);
-      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
-    }
-
-    .btn-add-category {
-      width: 100%;
-      height: 52px;
-      background: var(--green);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 4px;
-      transition: filter .15s;
-    }
-
-    .btn-add-category:active { filter: brightness(.9); }
 
     /* ── CONFIRM MODAL ── */
     .confirm-overlay {
@@ -515,9 +448,34 @@
     .empty-state svg { opacity: .3; margin-bottom: 12px; }
     .empty-state p { font-size: 15px; }
 
+    /* ── CLEAR BTN (bottom of list) ── */
+    .btn-clear-bottom {
+      display: block;
+      width: 100%;
+      padding: 20px 16px 28px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      color: #aaa;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-clear-bottom:active { opacity: .6; }
+
+    /* ── ITEM SLIDE-OUT ANIMATION ── */
+    @keyframes slideOutFade {
+      to { transform: translateX(-100%); opacity: 0; max-height: 0; padding: 0; margin: 0; }
+    }
+
+    .item.deleting {
+      animation: slideOutFade .25s ease forwards;
+      overflow: hidden;
+    }
+
     @media (min-width: 480px) {
       .category { margin: 12px 16px 0; }
-      main { padding-top: calc(var(--header-h) + 57px); }
     }
   </style>
 </head>
@@ -534,8 +492,13 @@
   </div>
 </header>
 
-<div class="toolbar">
-  <button class="btn-clear" id="btn-clear">Limpar valores</button>
+<!-- Barra de busca fixa -->
+<div id="search-bar">
+  <span class="search-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </span>
+  <input type="text" id="search-input" placeholder="Buscar produto ou categoria..." autocomplete="off" autocorrect="off" />
+  <button id="search-clear" aria-label="Limpar busca">×</button>
 </div>
 
 <main id="list-root"></main>
@@ -555,21 +518,6 @@
   </button>
 </div>
 
-<button id="fab" aria-label="Adicionar categoria">+</button>
-
-<!-- Modal adicionar categoria -->
-<div class="overlay" id="modal-overlay" role="dialog" aria-modal="true">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <h2>Nova categoria</h2>
-    <div class="form-field">
-      <label for="inp-cat-name">Nome da categoria</label>
-      <input type="text" id="inp-cat-name" placeholder="Ex: Hortifruti" autocomplete="off" />
-    </div>
-    <button class="btn-add-category" id="btn-add-category">Criar categoria</button>
-  </div>
-</div>
-
 <!-- Modal confirmar limpeza -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
@@ -578,6 +526,18 @@
     <div class="confirm-actions">
       <button class="btn-cancel" id="btn-cancel-clear">Cancelar</button>
       <button class="btn-confirm" id="btn-confirm-clear">Limpar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmar exclusão de produto -->
+<div class="confirm-overlay" id="delete-confirm-overlay">
+  <div class="confirm-box">
+    <h3>Excluir produto?</h3>
+    <p id="delete-confirm-text">O produto será removido da lista.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="btn-cancel-delete">Cancelar</button>
+      <button class="btn-confirm" id="btn-confirm-delete">Excluir</button>
     </div>
   </div>
 </div>
@@ -601,8 +561,18 @@
     '#4a7a2d'  // verde oliva
   ];
 
+  // Fixed colors for new named categories
+  const NAMED_CAT_COLORS = {
+    'Hortifruti': '#4a7c59',
+    'Congelados': '#2980b9',
+    'Snacks e petiscos': '#c0392b',
+    'Bebidas': '#8e44ad',
+    'Cereais e café da manhã': '#d35400',
+    'Sem categoria': '#888888'
+  };
+
   function getCatColor(index, catName) {
-    if (catName === 'Sem categoria') return '#888888';
+    if (NAMED_CAT_COLORS[catName]) return NAMED_CAT_COLORS[catName];
     return CAT_COLORS[index % CAT_COLORS.length];
   }
 
@@ -627,6 +597,11 @@
       id: 'cafe',
       name: 'Café da manhã e bebidas',
       items: ['Café','Leite em pó','Leite','Toddy']
+    },
+    {
+      id: 'cereais',
+      name: 'Cereais e café da manhã',
+      items: ['Granola','Aveia em flocos','Mel','Geleia','Tapioca','Cuscuz']
     },
     {
       id: 'biscoitos',
@@ -662,15 +637,33 @@
       id: 'acougue',
       name: 'Açougue e carnes',
       items: ['Coração de galinha','Filé de peito','Coxinha da asa']
+    },
+    {
+      id: 'hortifruti',
+      name: 'Hortifruti',
+      items: ['Alface','Tomate','Cenoura','Batata','Cebola','Alho','Banana','Maçã','Laranja','Limão']
+    },
+    {
+      id: 'congelados',
+      name: 'Congelados',
+      items: ['Pizza congelada','Sorvete','Nuggets','Batata frita congelada']
+    },
+    {
+      id: 'snacks',
+      name: 'Snacks e petiscos',
+      items: ['Salgadinho','Chocolate','Amendoim','Pipoca de micro-ondas']
+    },
+    {
+      id: 'bebidas',
+      name: 'Bebidas',
+      items: ['Água mineral','Refrigerante','Suco de caixinha','Cerveja']
     }
   ];
 
   // ─── STATE ──────────────────────────────────────────────────────
-  // products.price is stored in centavos (integer), '' when empty
-  // products.qty is stored as string (number or '')
   let state = {
-    categories: [],   // [{id, name, collapsed}]
-    products: [],     // [{id, name, catId, qty, price}]
+    categories: [],
+    products: [],
     nextId: 1
   };
 
@@ -681,12 +674,11 @@
         const parsed = JSON.parse(saved);
         if (parsed && parsed.categories && parsed.products) {
           state = parsed;
-          // Migrate old price format (decimal string → centavos integer)
+          // Migrate old price format
           state.products.forEach(p => {
             if (p.price !== '' && p.price !== null && p.price !== undefined) {
               const v = p.price;
               if (typeof v === 'string' && v !== '') {
-                // old format was decimal string like "9.99" or "9,99"
                 const clean = v.replace(',', '.');
                 const num = parseFloat(clean);
                 if (!isNaN(num)) {
@@ -695,9 +687,10 @@
                   p.price = '';
                 }
               }
-              // if already integer, keep as-is
             }
           });
+          // Ensure new categories exist in saved state
+          ensureNewCategories();
           return;
         }
       }
@@ -715,6 +708,21 @@
     saveState();
   }
 
+  function ensureNewCategories() {
+    const newCats = [
+      { id: 'hortifruti', name: 'Hortifruti' },
+      { id: 'congelados', name: 'Congelados' },
+      { id: 'snacks', name: 'Snacks e petiscos' },
+      { id: 'bebidas', name: 'Bebidas' },
+      { id: 'cereais', name: 'Cereais e café da manhã' }
+    ];
+    newCats.forEach(nc => {
+      if (!state.categories.find(c => c.id === nc.id)) {
+        state.categories.push({ id: nc.id, name: nc.name, collapsed: false });
+      }
+    });
+  }
+
   function saveState() {
     try {
       localStorage.setItem('feira_state', JSON.stringify(state));
@@ -722,10 +730,7 @@
   }
 
   // ─── PRICE MASK HELPERS ─────────────────────────────────────────
-  // price stored internally as integer centavos ('' when empty)
-
   function centavosToDisplay(centavos) {
-    // centavos: integer or ''
     if (centavos === '' || centavos === null || centavos === undefined) return '';
     const n = parseInt(centavos, 10);
     if (isNaN(n) || n === 0) return '';
@@ -735,8 +740,6 @@
   }
 
   function applyPriceMask(rawValue) {
-    // rawValue: current input string (may contain digits, comma, dot, etc.)
-    // returns {display: string, centavos: int|''}
     const digits = rawValue.replace(/\D/g, '');
     if (digits === '' || digits === '0') return { display: '', centavos: '' };
     const n = parseInt(digits, 10);
@@ -756,7 +759,6 @@
   }
 
   function formatBRL(centavos) {
-    // centavos: integer
     const n = centavos / 100;
     return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
@@ -773,35 +775,58 @@
       .replace(/"/g, '&quot;');
   }
 
+  // ─── NORMALIZE (accent-insensitive) ─────────────────────────────
+  function normalizeStr(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .trim();
+  }
+
   // ─── RENDER ─────────────────────────────────────────────────────
   const root = document.getElementById('list-root');
 
   function render() {
+    const searchTerm = normalizeStr(document.getElementById('search-input').value || '');
+
     root.innerHTML = '';
 
-    // "Sem categoria" sempre no final
     const sortedCats = [
       ...state.categories.filter(c => c.name !== 'Sem categoria'),
       ...state.categories.filter(c => c.name === 'Sem categoria')
     ];
 
     sortedCats.forEach((cat, catIndex) => {
-      const prods = state.products.filter(p => p.catId === cat.id);
-      // Não renderiza "Sem categoria" se estiver vazia
-      if (cat.name === 'Sem categoria' && prods.length === 0) return;
-      const catColor = getCatColor(catIndex, cat.name);
+      let prods = state.products.filter(p => p.catId === cat.id);
 
-      const checkedCount = prods.filter(p => p.price !== '' && p.price > 0).length;
+      // Filter by search
+      let filteredProds = prods;
+      if (searchTerm) {
+        const catMatch = normalizeStr(cat.name).includes(searchTerm);
+        if (catMatch) {
+          filteredProds = prods; // show all products in matched category
+        } else {
+          filteredProds = prods.filter(p => normalizeStr(p.name).includes(searchTerm));
+        }
+      }
+
+      if (cat.name === 'Sem categoria' && filteredProds.length === 0) return;
+      if (searchTerm && filteredProds.length === 0) return;
+
+      const catColor = getCatColor(catIndex, cat.name);
+      const checkedCount = filteredProds.filter(p => p.price !== '' && p.price > 0).length;
+
+      // When searching, auto-expand categories with results
+      const isCollapsed = searchTerm ? false : cat.collapsed;
 
       const section = document.createElement('div');
-      section.className = 'category' + (cat.collapsed ? ' collapsed' : '');
+      section.className = 'category' + (isCollapsed ? ' collapsed' : '');
       section.dataset.catId = cat.id;
       section.style.setProperty('--cat-color', catColor);
 
       section.innerHTML = `
         <div class="category-header" data-cat-header="${cat.id}" style="background:${catColor}">
           <span class="category-title">${escapeHtml(cat.name)}</span>
-          <span class="category-badge">${checkedCount}/${prods.length}</span>
+          <span class="category-badge">${checkedCount}/${filteredProds.length}</span>
           <span class="category-chevron">&#8964;</span>
         </div>
         <div class="category-body" id="cat-body-${cat.id}"></div>
@@ -809,7 +834,7 @@
 
       const body = section.querySelector('.category-body');
 
-      prods.forEach(prod => {
+      filteredProds.forEach(prod => {
         const isChecked = prod.price !== '' && prod.price > 0;
         const itemEl = document.createElement('div');
         itemEl.className = 'item' + (isChecked ? ' checked' : '');
@@ -818,6 +843,7 @@
         const displayPrice = centavosToDisplay(prod.price);
 
         itemEl.innerHTML = `
+          <div class="item-delete-bg" aria-hidden="true">🗑️</div>
           <div class="item-name">
             <span class="check-icon" style="background:${catColor}">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -852,6 +878,7 @@
           </div>
         `;
 
+        attachSwipeToDelete(itemEl, prod.id);
         body.appendChild(itemEl);
       });
 
@@ -862,9 +889,19 @@
     if (root.children.length === 0) {
       root.innerHTML = `<div class="empty-state">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <p>Nenhuma categoria ainda.<br>Toque no + para adicionar.</p>
+        <p>${document.getElementById('search-input').value ? 'Nenhum produto encontrado.' : 'Nenhum produto na lista.'}</p>
       </div>`;
     }
+
+    // Clear button at end of list
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'btn-clear-bottom';
+    clearBtn.id = 'btn-clear-bottom';
+    clearBtn.textContent = 'Limpar todos os valores';
+    clearBtn.addEventListener('click', () => {
+      document.getElementById('confirm-overlay').classList.add('open');
+    });
+    root.appendChild(clearBtn);
 
     updateSummary();
   }
@@ -888,7 +925,6 @@
     document.getElementById('counter').textContent = `${checked} de ${allCount} itens pegos`;
   }
 
-  // Lightweight partial update: just update item class + summary (no full re-render)
   function patchItemUI(prodId) {
     const prod = state.products.find(p => p.id === prodId);
     if (!prod) return;
@@ -898,7 +934,6 @@
     if (isChecked) itemEl.classList.add('checked');
     else itemEl.classList.remove('checked');
 
-    // update badge for category
     const catForBadge = state.categories.find(c => c.id === prod.catId);
     if (catForBadge) {
       const prods = state.products.filter(p => p.catId === catForBadge.id);
@@ -910,18 +945,194 @@
     updateSummary();
   }
 
+  // ─── SWIPE TO DELETE ─────────────────────────────────────────────
+  function attachSwipeToDelete(itemEl, prodId) {
+    const bg = itemEl.querySelector('.item-delete-bg');
+    let startX = 0, startY = 0, currentX = 0;
+    let isDragging = false;
+    let isHorizontal = null;
+
+    const THRESHOLD = 0.4; // 40% of width
+
+    function onStart(x, y) {
+      startX = x;
+      startY = y;
+      currentX = 0;
+      isDragging = true;
+      isHorizontal = null;
+      itemEl.style.transition = 'none';
+    }
+
+    function onMove(x, y) {
+      if (!isDragging) return;
+      const dx = x - startX;
+      const dy = y - startY;
+
+      if (isHorizontal === null) {
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+          isHorizontal = Math.abs(dx) > Math.abs(dy);
+        }
+      }
+
+      if (!isHorizontal) return;
+
+      // Only left swipe
+      currentX = Math.min(0, dx);
+      const absX = Math.abs(currentX);
+      const w = itemEl.offsetWidth;
+
+      // Move the item content (all children except bg)
+      const children = Array.from(itemEl.children).filter(el => !el.classList.contains('item-delete-bg'));
+      children.forEach(ch => {
+        ch.style.transform = `translateX(${currentX}px)`;
+        ch.style.transition = 'none';
+      });
+
+      // Show/hide delete bg
+      if (absX > 20) {
+        bg.classList.add('visible');
+      } else {
+        bg.classList.remove('visible');
+      }
+    }
+
+    function onEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      if (!isHorizontal) return;
+
+      const w = itemEl.offsetWidth;
+      const absX = Math.abs(currentX);
+      const children = Array.from(itemEl.children).filter(el => !el.classList.contains('item-delete-bg'));
+
+      if (absX / w >= THRESHOLD) {
+        // Delete
+        children.forEach(ch => {
+          ch.style.transition = 'transform .2s ease';
+          ch.style.transform = `translateX(-${w}px)`;
+        });
+        itemEl.style.transition = 'max-height .3s ease, opacity .3s ease, padding .3s ease, margin .3s ease';
+
+        setTimeout(() => {
+          deleteProduct(prodId, itemEl);
+        }, 200);
+      } else {
+        // Snap back
+        children.forEach(ch => {
+          ch.style.transition = 'transform .2s ease';
+          ch.style.transform = 'translateX(0)';
+        });
+        bg.classList.remove('visible');
+      }
+    }
+
+    // Touch events
+    itemEl.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      onStart(t.clientX, t.clientY);
+    }, { passive: true });
+
+    itemEl.addEventListener('touchmove', e => {
+      const t = e.touches[0];
+      if (isHorizontal) e.preventDefault();
+      onMove(t.clientX, t.clientY);
+    }, { passive: false });
+
+    itemEl.addEventListener('touchend', () => onEnd());
+    itemEl.addEventListener('touchcancel', () => {
+      isDragging = false;
+      const children = Array.from(itemEl.children).filter(el => !el.classList.contains('item-delete-bg'));
+      children.forEach(ch => {
+        ch.style.transition = 'transform .2s ease';
+        ch.style.transform = 'translateX(0)';
+      });
+      bg.classList.remove('visible');
+    });
+
+    // Mouse events (desktop)
+    itemEl.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      onStart(e.clientX, e.clientY);
+
+      const onMouseMove = ev => onMove(ev.clientX, ev.clientY);
+      const onMouseUp = () => {
+        onEnd();
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+  }
+
+  // ─── DELETE PRODUCT ──────────────────────────────────────────────
+  function deleteProduct(prodId, itemEl) {
+    state.products = state.products.filter(p => p.id !== prodId);
+    saveState();
+
+    if (itemEl && itemEl.parentNode) {
+      itemEl.style.maxHeight = itemEl.offsetHeight + 'px';
+      itemEl.style.overflow = 'hidden';
+      requestAnimationFrame(() => {
+        itemEl.style.transition = 'max-height .25s ease, opacity .25s ease';
+        itemEl.style.maxHeight = '0';
+        itemEl.style.opacity = '0';
+        setTimeout(() => {
+          if (itemEl.parentNode) itemEl.parentNode.removeChild(itemEl);
+          updateSummary();
+          updateBadgesAfterDelete();
+        }, 260);
+      });
+    } else {
+      render();
+    }
+  }
+
+  function updateBadgesAfterDelete() {
+    state.categories.forEach(cat => {
+      const prods = state.products.filter(p => p.catId === cat.id);
+      const cc = prods.filter(p => p.price !== '' && p.price > 0).length;
+      const badge = root.querySelector(`.category[data-cat-id="${cat.id}"] .category-badge`);
+      if (badge) badge.textContent = `${cc}/${prods.length}`;
+    });
+  }
+
   // ─── PRODUCT DICTIONARY ──────────────────────────────────────────
   const PRODUCT_DICT = {
     // Mercearia básica
     'arroz': 'Mercearia básica',
     'feijao': 'Mercearia básica', 'feijão': 'Mercearia básica',
-    'macarrao': 'Mercearia básica', 'macarrão': 'Mercearia básica', 'massa': 'Mercearia básica', 'espaguete': 'Mercearia básica', 'fusilli': 'Mercearia básica', 'penne': 'Mercearia básica',
+    'macarrao': 'Mercearia básica', 'macarrão': 'Mercearia básica', 'espaguete': 'Mercearia básica', 'fusilli': 'Mercearia básica', 'penne': 'Mercearia básica',
     'acucar': 'Mercearia básica', 'açúcar': 'Mercearia básica',
     'miojo': 'Mercearia básica', 'lamen': 'Mercearia básica', 'lámen': 'Mercearia básica',
-    'farinha': 'Mercearia básica', 'amido': 'Mercearia básica', 'fuba': 'Mercearia básica', 'fubá': 'Mercearia básica',
-    'aveia': 'Mercearia básica', 'granola': 'Mercearia básica',
-    'lentilha': 'Mercearia básica', 'grao': 'Mercearia básica', 'grão': 'Mercearia básica', 'ervilha seca': 'Mercearia básica',
-    'tapioca': 'Mercearia básica',
+    'farinha': 'Mercearia básica',
+    'amido de milho': 'Mercearia básica',
+    'fuba': 'Mercearia básica', 'fubá': 'Mercearia básica',
+    'polenta': 'Mercearia básica',
+    'canjica': 'Mercearia básica',
+    'quirera': 'Mercearia básica',
+    'trigo para quibe': 'Mercearia básica',
+    'lentilha': 'Mercearia básica',
+    'grao de bico': 'Mercearia básica', 'grão-de-bico': 'Mercearia básica', 'grao-de-bico': 'Mercearia básica',
+    'amendoim cru': 'Mercearia básica',
+    'quinoa': 'Mercearia básica',
+    'chia': 'Mercearia básica',
+    'linhaca': 'Mercearia básica', 'linhaça': 'Mercearia básica',
+    'gergelim': 'Mercearia básica',
+    'castanha do para': 'Mercearia básica', 'castanha do pará': 'Mercearia básica',
+    'passas': 'Mercearia básica',
+    'tamara': 'Mercearia básica', 'tâmara': 'Mercearia básica',
+    'damasco': 'Mercearia básica',
+    'coco ralado': 'Mercearia básica',
+    'fermento': 'Mercearia básica',
+    'bicarbonato': 'Mercearia básica',
+    'sal grosso': 'Mercearia básica',
+    'acucar mascavo': 'Mercearia básica', 'açúcar mascavo': 'Mercearia básica',
+    'acucar demerara': 'Mercearia básica', 'açúcar demerara': 'Mercearia básica',
+    'mel de abelha': 'Mercearia básica',
+    'adocante': 'Mercearia básica', 'adoçante': 'Mercearia básica',
+    'stevia': 'Mercearia básica', 'stévia': 'Mercearia básica',
+    'extrato de baunilha': 'Mercearia básica',
 
     // Temperos, molhos e condimentos
     'sal': 'Temperos, molhos e condimentos',
@@ -938,15 +1149,36 @@
     'azeitona': 'Temperos, molhos e condimentos',
     'tempero': 'Temperos, molhos e condimentos',
     'ajinomoto': 'Temperos, molhos e condimentos',
-    'shoyu': 'Temperos, molhos e condimentos', 'soja molho': 'Temperos, molhos e condimentos',
+    'shoyu': 'Temperos, molhos e condimentos',
     'curry': 'Temperos, molhos e condimentos',
     'canela': 'Temperos, molhos e condimentos',
     'oregano': 'Temperos, molhos e condimentos', 'orégano': 'Temperos, molhos e condimentos',
     'louro': 'Temperos, molhos e condimentos',
     'colorau': 'Temperos, molhos e condimentos',
-    'páprica': 'Temperos, molhos e condimentos', 'paprica': 'Temperos, molhos e condimentos',
+    'paprica': 'Temperos, molhos e condimentos', 'páprica': 'Temperos, molhos e condimentos',
     'chimichurri': 'Temperos, molhos e condimentos',
     'parrilla': 'Temperos, molhos e condimentos',
+    'acafrao em po': 'Temperos, molhos e condimentos', 'açafrão em pó': 'Temperos, molhos e condimentos',
+    'curcuma': 'Temperos, molhos e condimentos', 'cúrcuma': 'Temperos, molhos e condimentos',
+    'cominho': 'Temperos, molhos e condimentos',
+    'urucum': 'Temperos, molhos e condimentos',
+    'noz-moscada': 'Temperos, molhos e condimentos', 'noz moscada': 'Temperos, molhos e condimentos',
+    'cardamomo': 'Temperos, molhos e condimentos',
+    'erva-doce': 'Temperos, molhos e condimentos', 'erva doce': 'Temperos, molhos e condimentos',
+    'anis': 'Temperos, molhos e condimentos',
+    'cravo': 'Temperos, molhos e condimentos',
+    'pimenta-do-reino': 'Temperos, molhos e condimentos',
+    'pimenta calabresa': 'Temperos, molhos e condimentos',
+    'pimenta branca': 'Temperos, molhos e condimentos',
+    'mix de ervas': 'Temperos, molhos e condimentos',
+    'caldo de carne': 'Temperos, molhos e condimentos',
+    'caldo de frango': 'Temperos, molhos e condimentos',
+    'caldo de legumes': 'Temperos, molhos e condimentos',
+    'sazon': 'Temperos, molhos e condimentos',
+    'tempero baiano': 'Temperos, molhos e condimentos',
+    'tempero completo': 'Temperos, molhos e condimentos',
+    'alecrim seco': 'Temperos, molhos e condimentos',
+    'manjericao seco': 'Temperos, molhos e condimentos', 'manjericão seco': 'Temperos, molhos e condimentos',
 
     // Enlatados e milho
     'milho': 'Enlatados e milho',
@@ -976,13 +1208,30 @@
     'parmesao': 'Frios e refrigerados', 'parmesão': 'Frios e refrigerados',
     'peito de peru': 'Frios e refrigerados',
     'ovo': 'Frios e refrigerados',
-    'ova': 'Frios e refrigerados',
+    'mozzarella de bufala': 'Frios e refrigerados', 'mozzarella de búfala': 'Frios e refrigerados',
+    'provolone': 'Frios e refrigerados',
+    'gorgonzola': 'Frios e refrigerados',
+    'brie': 'Frios e refrigerados',
+    'camembert': 'Frios e refrigerados',
+    'cream cheese': 'Frios e refrigerados',
+    'ricota': 'Frios e refrigerados',
+    'cottage': 'Frios e refrigerados',
+    'coalhada': 'Frios e refrigerados',
+    'creme azedo': 'Frios e refrigerados',
+    'leite cru': 'Frios e refrigerados',
+    'leite desnatado': 'Frios e refrigerados',
+    'leite semi': 'Frios e refrigerados',
+    'leite zero lactose': 'Frios e refrigerados',
+    'leite de aveia': 'Frios e refrigerados',
+    'leite de amendoa': 'Frios e refrigerados', 'leite de amêndoa': 'Frios e refrigerados',
+    'creme de leite fresco': 'Frios e refrigerados',
+    'chantilly': 'Frios e refrigerados',
 
     // Açougue e carnes
     'frango': 'Açougue e carnes',
     'galinha': 'Açougue e carnes',
-    'coxinha': 'Açougue e carnes',
-    'coração': 'Açougue e carnes', 'coracao': 'Açougue e carnes',
+    'coxinha da asa': 'Açougue e carnes',
+    'coracao': 'Açougue e carnes', 'coração': 'Açougue e carnes',
     'file': 'Açougue e carnes', 'filé': 'Açougue e carnes',
     'peito': 'Açougue e carnes',
     'carne': 'Açougue e carnes',
@@ -992,17 +1241,44 @@
     'musculo': 'Açougue e carnes', 'músculo': 'Açougue e carnes',
     'costela': 'Açougue e carnes',
     'contrafile': 'Açougue e carnes', 'contrafilé': 'Açougue e carnes',
-    'acém': 'Açougue e carnes', 'acem': 'Açougue e carnes',
+    'acem': 'Açougue e carnes', 'acém': 'Açougue e carnes',
     'bife': 'Açougue e carnes',
-    'pork': 'Açougue e carnes',
     'porco': 'Açougue e carnes',
     'bisteca': 'Açougue e carnes',
-    'asa': 'Açougue e carnes',
     'sobrecoxa': 'Açougue e carnes',
     'coxa': 'Açougue e carnes',
     'peixe': 'Açougue e carnes',
     'tilapia': 'Açougue e carnes', 'tilápia': 'Açougue e carnes',
     'salmao': 'Açougue e carnes', 'salmão': 'Açougue e carnes',
+    'linguica toscana': 'Açougue e carnes', 'linguiça toscana': 'Açougue e carnes',
+    'paio': 'Açougue e carnes',
+    'chourico': 'Açougue e carnes', 'chouriço': 'Açougue e carnes',
+    'carne moida': 'Açougue e carnes', 'carne moída': 'Açougue e carnes',
+    'carne de sol': 'Açougue e carnes',
+    'charque': 'Açougue e carnes',
+    'jaba': 'Açougue e carnes', 'jabá': 'Açougue e carnes',
+    'pernil': 'Açougue e carnes',
+    'paleta': 'Açougue e carnes',
+    'lombinho': 'Açougue e carnes',
+    'copa': 'Açougue e carnes',
+    't-bone': 'Açougue e carnes',
+    'ancho': 'Açougue e carnes',
+    'baby beef': 'Açougue e carnes',
+    'maminha': 'Açougue e carnes',
+    'lagarto': 'Açougue e carnes',
+    'coxao duro': 'Açougue e carnes', 'coxão duro': 'Açougue e carnes',
+    'coxao mole': 'Açougue e carnes', 'coxão mole': 'Açougue e carnes',
+    'fraldinha': 'Açougue e carnes',
+    'cupim': 'Açougue e carnes',
+    'rabo bovino': 'Açougue e carnes',
+    'joelho de porco': 'Açougue e carnes',
+    'costelinha de porco': 'Açougue e carnes',
+    'file de tilapia': 'Açougue e carnes', 'filé de tilápia': 'Açougue e carnes',
+    'camarao': 'Açougue e carnes', 'camarão': 'Açougue e carnes',
+    'polvo': 'Açougue e carnes',
+    'lula': 'Açougue e carnes',
+    'mexilhao': 'Açougue e carnes', 'mexilhão': 'Açougue e carnes',
+    'bacalhau': 'Açougue e carnes',
 
     // Café da manhã e bebidas
     'cafe': 'Café da manhã e bebidas', 'café': 'Café da manhã e bebidas',
@@ -1010,17 +1286,32 @@
     'toddy': 'Café da manhã e bebidas',
     'nescau': 'Café da manhã e bebidas',
     'achocolatado': 'Café da manhã e bebidas',
-    'suco': 'Café da manhã e bebidas',
-    'nectar': 'Café da manhã e bebidas', 'néctar': 'Café da manhã e bebidas',
     'cha': 'Café da manhã e bebidas', 'chá': 'Café da manhã e bebidas',
-    'refrigerante': 'Café da manhã e bebidas',
-    'coca': 'Café da manhã e bebidas',
-    'pepsi': 'Café da manhã e bebidas',
-    'agua': 'Café da manhã e bebidas', 'água': 'Café da manhã e bebidas',
-    'cerveja': 'Café da manhã e bebidas',
-    'vinho': 'Café da manhã e bebidas',
     'capuccino': 'Café da manhã e bebidas', 'cappuccino': 'Café da manhã e bebidas',
     'mate': 'Café da manhã e bebidas',
+    'leite em po': 'Café da manhã e bebidas', 'leite em pó': 'Café da manhã e bebidas',
+
+    // Cereais e café da manhã
+    'cereal matinal': 'Cereais e café da manhã',
+    'granola': 'Cereais e café da manhã',
+    'aveia em flocos': 'Cereais e café da manhã',
+    'aveia instantanea': 'Cereais e café da manhã', 'aveia instantânea': 'Cereais e café da manhã',
+    'musli': 'Cereais e café da manhã', 'müsli': 'Cereais e café da manhã',
+    'sucrilhos': 'Cereais e café da manhã',
+    'froot loops': 'Cereais e café da manhã',
+    'corn flakes': 'Cereais e café da manhã',
+    'nescau cereal': 'Cereais e café da manhã',
+    'mel': 'Cereais e café da manhã',
+    'geleia': 'Cereais e café da manhã',
+    'compota': 'Cereais e café da manhã',
+    'creme de avela': 'Cereais e café da manhã', 'creme de avelã': 'Cereais e café da manhã',
+    'pasta de amendoim': 'Cereais e café da manhã',
+    'tapioca': 'Cereais e café da manhã',
+    'cuscuz': 'Cereais e café da manhã',
+    'mingau': 'Cereais e café da manhã',
+    'danone': 'Cereais e café da manhã',
+    'iogurte grego': 'Cereais e café da manhã',
+    'vitamina de baunilha': 'Cereais e café da manhã',
 
     // Biscoitos e bolachas
     'bolacha': 'Biscoitos e bolachas',
@@ -1040,7 +1331,6 @@
     'broa': 'Padaria',
     'croissant': 'Padaria',
     'brioche': 'Padaria',
-    'forma': 'Padaria',
 
     // Limpeza da casa
     'sabao': 'Limpeza da casa', 'sabão': 'Limpeza da casa',
@@ -1064,6 +1354,24 @@
     'vanish': 'Limpeza da casa',
     'cif': 'Limpeza da casa',
     'pinho sol': 'Limpeza da casa',
+    'limpa-vidros': 'Limpeza da casa', 'limpa vidros': 'Limpeza da casa',
+    'tira-limo': 'Limpeza da casa', 'tira limo': 'Limpeza da casa',
+    'limpa-forno': 'Limpeza da casa', 'limpa forno': 'Limpeza da casa',
+    'desentupidor': 'Limpeza da casa',
+    'pano de chao': 'Limpeza da casa', 'pano de chão': 'Limpeza da casa',
+    'rodo': 'Limpeza da casa',
+    'vassoura': 'Limpeza da casa',
+    'escova de roupa': 'Limpeza da casa',
+    'tabua de passar': 'Limpeza da casa', 'tábua de passar': 'Limpeza da casa',
+    'amaciante concentrado': 'Limpeza da casa',
+    'lava-loucas em po': 'Limpeza da casa', 'lava-louças em pó': 'Limpeza da casa',
+    'detergente neutro': 'Limpeza da casa',
+    'esponja de aco': 'Limpeza da casa', 'esponja de aço': 'Limpeza da casa',
+    'luva de borracha': 'Limpeza da casa',
+    'pano de prato': 'Limpeza da casa',
+    'saco de lixo': 'Limpeza da casa',
+    'difusor': 'Limpeza da casa',
+    'vela aromatica': 'Limpeza da casa', 'vela aromática': 'Limpeza da casa',
 
     // Papéis, descartáveis e utilidades
     'papel': 'Papéis, descartáveis e utilidades',
@@ -1083,11 +1391,10 @@
     'sabonete': 'Higiene pessoal',
     'shampoo': 'Higiene pessoal', 'xampu': 'Higiene pessoal',
     'condicionador': 'Higiene pessoal',
-    'creme': 'Higiene pessoal',
     'hidratante': 'Higiene pessoal',
     'desodorante': 'Higiene pessoal',
-    'escova': 'Higiene pessoal',
-    'pasta': 'Higiene pessoal',
+    'escova de dente': 'Higiene pessoal',
+    'pasta de dente': 'Higiene pessoal',
     'creme dental': 'Higiene pessoal',
     'fio dental': 'Higiene pessoal',
     'gilete': 'Higiene pessoal',
@@ -1100,26 +1407,217 @@
     'algodao': 'Higiene pessoal', 'algodão': 'Higiene pessoal',
     'perfume': 'Higiene pessoal',
     'protetor solar': 'Higiene pessoal',
-    'maquiagem': 'Higiene pessoal',
-    'batom': 'Higiene pessoal',
-    'removedor': 'Higiene pessoal',
     'herbissimo': 'Higiene pessoal', 'herbíssimo': 'Higiene pessoal',
+    'creme hidratante': 'Higiene pessoal',
+    'body splash': 'Higiene pessoal',
+    'colonia': 'Higiene pessoal', 'colônia': 'Higiene pessoal',
+    'esfoliante': 'Higiene pessoal',
+    'mascara facial': 'Higiene pessoal', 'máscara facial': 'Higiene pessoal',
+    'tonico': 'Higiene pessoal', 'tônico': 'Higiene pessoal',
+    'serum': 'Higiene pessoal', 'sérum': 'Higiene pessoal',
+    'oleo corporal': 'Higiene pessoal', 'óleo corporal': 'Higiene pessoal',
+    'protetor solar facial': 'Higiene pessoal',
+    'base': 'Higiene pessoal',
+    'corretivo': 'Higiene pessoal',
+    'rimel': 'Higiene pessoal', 'rímel': 'Higiene pessoal',
+    'delineador': 'Higiene pessoal',
+    'sombra': 'Higiene pessoal',
+    'blush': 'Higiene pessoal',
+    'po compacto': 'Higiene pessoal', 'pó compacto': 'Higiene pessoal',
+    'esmalte': 'Higiene pessoal',
+    'acetona': 'Higiene pessoal',
+    'lixa de unha': 'Higiene pessoal',
+    'pincel': 'Higiene pessoal',
+    'esponja de maquiagem': 'Higiene pessoal',
+    'pinca': 'Higiene pessoal', 'pinça': 'Higiene pessoal',
+    'lamina de depilacao': 'Higiene pessoal', 'lâmina de depilação': 'Higiene pessoal',
+    'creme depilatorio': 'Higiene pessoal', 'creme depilatório': 'Higiene pessoal',
+    'fita depilatoria': 'Higiene pessoal', 'fita depilatória': 'Higiene pessoal',
+
+    // Hortifruti
+    'alface': 'Hortifruti',
+    'rucula': 'Hortifruti', 'rúcula': 'Hortifruti',
+    'espinafre': 'Hortifruti',
+    'couve': 'Hortifruti',
+    'agriao': 'Hortifruti', 'agrião': 'Hortifruti',
+    'acelga': 'Hortifruti',
+    'repolho': 'Hortifruti',
+    'brocolis': 'Hortifruti', 'brócolis': 'Hortifruti',
+    'couve-flor': 'Hortifruti', 'couve flor': 'Hortifruti',
+    'chuchu': 'Hortifruti',
+    'abobrinha': 'Hortifruti',
+    'berinjela': 'Hortifruti',
+    'pimentao': 'Hortifruti', 'pimentão': 'Hortifruti',
+    'tomate': 'Hortifruti',
+    'tomate cereja': 'Hortifruti',
+    'pepino': 'Hortifruti',
+    'cenoura': 'Hortifruti',
+    'beterraba': 'Hortifruti',
+    'batata': 'Hortifruti',
+    'batata-doce': 'Hortifruti', 'batata doce': 'Hortifruti',
+    'inhame': 'Hortifruti',
+    'cara': 'Hortifruti', 'cará': 'Hortifruti',
+    'mandioca': 'Hortifruti',
+    'aipim': 'Hortifruti',
+    'macaxeira': 'Hortifruti',
+    'milho verde': 'Hortifruti',
+    'vagem': 'Hortifruti',
+    'quiabo': 'Hortifruti',
+    'jilo': 'Hortifruti', 'jiló': 'Hortifruti',
+    'maxixe': 'Hortifruti',
+    'ervilha fresca': 'Hortifruti',
+    'abobora': 'Hortifruti', 'abóbora': 'Hortifruti',
+    'moranga': 'Hortifruti',
+    'alho-poro': 'Hortifruti', 'alho-poró': 'Hortifruti', 'alho poro': 'Hortifruti',
+    'gengibre': 'Hortifruti',
+    'acafrao': 'Hortifruti', 'açafrão': 'Hortifruti',
+    'curcuma fresca': 'Hortifruti',
+    'salsinha': 'Hortifruti',
+    'cebolinha': 'Hortifruti',
+    'coentro': 'Hortifruti',
+    'manjericao': 'Hortifruti', 'manjericão': 'Hortifruti',
+    'hortela': 'Hortifruti', 'hortelã': 'Hortifruti',
+    'alecrim': 'Hortifruti',
+    'tomilho': 'Hortifruti',
+    'maca': 'Hortifruti', 'maçã': 'Hortifruti',
+    'pera': 'Hortifruti',
+    'banana': 'Hortifruti',
+    'laranja': 'Hortifruti',
+    'limao': 'Hortifruti', 'limão': 'Hortifruti',
+    'abacaxi': 'Hortifruti',
+    'manga': 'Hortifruti',
+    'mamao': 'Hortifruti', 'mamão': 'Hortifruti',
+    'melao': 'Hortifruti', 'melão': 'Hortifruti',
+    'melancia': 'Hortifruti',
+    'uva': 'Hortifruti',
+    'morango': 'Hortifruti',
+    'goiaba': 'Hortifruti',
+    'maracuja': 'Hortifruti', 'maracujá': 'Hortifruti',
+    'caqui': 'Hortifruti',
+    'ameixa': 'Hortifruti',
+    'nectarina': 'Hortifruti',
+    'pessego': 'Hortifruti', 'pêssego': 'Hortifruti',
+    'kiwi': 'Hortifruti',
+    'abacate': 'Hortifruti',
+    'coco': 'Hortifruti',
+    'framboesa': 'Hortifruti',
+    'mirtilo': 'Hortifruti',
+    'roma': 'Hortifruti', 'romã': 'Hortifruti',
+    'figo': 'Hortifruti',
+    'acerola': 'Hortifruti',
+    'pitaya': 'Hortifruti',
+    'carambola': 'Hortifruti',
+    'graviola': 'Hortifruti',
+
+    // Congelados
+    'pizza congelada': 'Congelados',
+    'lasanha congelada': 'Congelados',
+    'frango congelado': 'Congelados',
+    'peixe congelado': 'Congelados',
+    'batata frita congelada': 'Congelados',
+    'nuggets': 'Congelados',
+    'hamburguer congelado': 'Congelados', 'hambúrguer congelado': 'Congelados',
+    'empanado': 'Congelados',
+    'file de frango congelado': 'Congelados', 'filé de frango congelado': 'Congelados',
+    'legumes congelados': 'Congelados',
+    'ervilha congelada': 'Congelados',
+    'milho congelado': 'Congelados',
+    'sorvete': 'Congelados',
+    'acai': 'Congelados', 'açaí': 'Congelados',
+    'polpa de fruta': 'Congelados',
+    'acai congelado': 'Congelados', 'açaí congelado': 'Congelados',
+    'massa folhada': 'Congelados',
+    'massa de pastel': 'Congelados',
+    'coxinha congelada': 'Congelados',
+    'esfiha congelada': 'Congelados',
+
+    // Snacks e petiscos
+    'salgadinho': 'Snacks e petiscos',
+    'chips': 'Snacks e petiscos',
+    'doritos': 'Snacks e petiscos',
+    'cheetos': 'Snacks e petiscos',
+    'batata chips': 'Snacks e petiscos',
+    'pipoca de micro-ondas': 'Snacks e petiscos', 'pipoca de micro ondas': 'Snacks e petiscos',
+    'amendoim': 'Snacks e petiscos',
+    'castanha': 'Snacks e petiscos',
+    'castanha de caju': 'Snacks e petiscos',
+    'nozes': 'Snacks e petiscos',
+    'amendoa': 'Snacks e petiscos', 'amêndoa': 'Snacks e petiscos',
+    'avela': 'Snacks e petiscos', 'avelã': 'Snacks e petiscos',
+    'mix de nuts': 'Snacks e petiscos',
+    'barra de cereal': 'Snacks e petiscos',
+    'barra de proteina': 'Snacks e petiscos', 'barra de proteína': 'Snacks e petiscos',
+    'pacoca': 'Snacks e petiscos', 'paçoca': 'Snacks e petiscos',
+    'rapadura': 'Snacks e petiscos',
+    'cocada': 'Snacks e petiscos',
+    'pe de moleque': 'Snacks e petiscos', 'pé de moleque': 'Snacks e petiscos',
+    'doce de leite': 'Snacks e petiscos',
+    'goiabada': 'Snacks e petiscos',
+    'bananada': 'Snacks e petiscos',
+    'brigadeiro': 'Snacks e petiscos',
+    'chocolate': 'Snacks e petiscos',
+    'kit kat': 'Snacks e petiscos',
+    'bis': 'Snacks e petiscos',
+    'toblerone': 'Snacks e petiscos',
+    'ferrero': 'Snacks e petiscos',
+    'nutella': 'Snacks e petiscos',
+    'gelatina': 'Snacks e petiscos',
+    'pudim': 'Snacks e petiscos',
+    'bolo de rolo': 'Snacks e petiscos',
+
+    // Bebidas
+    'agua com gas': 'Bebidas', 'água com gás': 'Bebidas',
+    'agua mineral': 'Bebidas', 'água mineral': 'Bebidas',
+    'agua de coco': 'Bebidas', 'água de coco': 'Bebidas',
+    'refrigerante': 'Bebidas',
+    'coca-cola': 'Bebidas', 'coca cola': 'Bebidas', 'coca': 'Bebidas',
+    'guarana': 'Bebidas', 'guaraná': 'Bebidas',
+    'fanta': 'Bebidas',
+    'sprite': 'Bebidas',
+    'pepsi': 'Bebidas',
+    'red bull': 'Bebidas',
+    'energetico': 'Bebidas', 'energético': 'Bebidas',
+    'suco de caixinha': 'Bebidas',
+    'suco natural': 'Bebidas',
+    'suco': 'Bebidas',
+    'limonada': 'Bebidas',
+    'vitamina': 'Bebidas',
+    'smoothie': 'Bebidas',
+    'cerveja': 'Bebidas',
+    'cerveja long neck': 'Bebidas',
+    'heineken': 'Bebidas',
+    'brahma': 'Bebidas',
+    'skol': 'Bebidas',
+    'itaipava': 'Bebidas',
+    'corona': 'Bebidas',
+    'budweiser': 'Bebidas',
+    'vinho tinto': 'Bebidas',
+    'vinho branco': 'Bebidas',
+    'vinho rose': 'Bebidas', 'vinho rosé': 'Bebidas',
+    'vinho': 'Bebidas',
+    'espumante': 'Bebidas',
+    'champagne': 'Bebidas',
+    'cachaca': 'Bebidas', 'cachaça': 'Bebidas',
+    'vodka': 'Bebidas',
+    'whisky': 'Bebidas',
+    'rum': 'Bebidas',
+    'gin': 'Bebidas',
+    'sidra': 'Bebidas',
+    'kombucha': 'Bebidas',
+    'yakult': 'Bebidas',
+    'bebida lactea': 'Bebidas', 'bebida láctea': 'Bebidas',
+    'leite fermentado': 'Bebidas',
+    'agua': 'Bebidas', 'água': 'Bebidas',
   };
 
   // ─── CATEGORY MATCHING ───────────────────────────────────────────
-  function normalizeStr(s) {
-    return s.toLowerCase()
-      .normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .trim();
-  }
-
   function guessCategory(productName) {
     const norm = normalizeStr(productName);
-    // Tenta match exato primeiro
+    // Exact match first
     for (const [key, cat] of Object.entries(PRODUCT_DICT)) {
       if (normalizeStr(key) === norm) return cat;
     }
-    // Depois tenta "input contém a chave" ou "chave contém o input"
+    // Partial match
     for (const [key, cat] of Object.entries(PRODUCT_DICT)) {
       const normKey = normalizeStr(key);
       if (norm.includes(normKey) || normKey.includes(norm)) return cat;
@@ -1142,20 +1640,17 @@
 
     const categoryName = guessCategory(trimmed);
 
-    // Garante categoria "Sem categoria" se necessário
     if (categoryName === 'Sem categoria') {
       ensureSemCategoria();
     }
 
-    // Encontra a categoria pelo nome
     let cat = state.categories.find(c => c.name === categoryName);
     if (!cat) {
-      // Fallback: cria "Sem categoria" se algo correu mal
       ensureSemCategoria();
       cat = state.categories.find(c => c.name === 'Sem categoria');
     }
 
-    // Se a categoria estava colapsada, expande
+    // Expand if collapsed
     if (cat.collapsed) {
       cat.collapsed = false;
     }
@@ -1165,16 +1660,17 @@
     saveState();
     render();
 
-    // Scroll até o novo item
-    setTimeout(() => {
-      const el = root.querySelector(`.item[data-prod-id="${prod.id}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 60);
+    // Scroll to new item
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = root.querySelector(`.item[data-prod-id="${prod.id}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
   }
 
   // ─── EVENT DELEGATION ────────────────────────────────────────────
   root.addEventListener('click', e => {
-    // category toggle
     const header = e.target.closest('[data-cat-header]');
     if (header) {
       const catId = header.dataset.catHeader;
@@ -1189,7 +1685,6 @@
   });
 
   root.addEventListener('input', e => {
-    // product field inputs
     const inp = e.target.closest('input[data-field]');
     if (!inp) return;
 
@@ -1200,7 +1695,6 @@
 
     if (field === 'price') {
       const { display, centavos } = applyPriceMask(inp.value);
-      // Only update DOM value if it changed to avoid cursor jumps
       if (inp.value !== display) inp.value = display;
       prod.price = centavos;
     } else {
@@ -1211,7 +1705,7 @@
     patchItemUI(id);
   });
 
-  // ─── BOTTOM BAR LISTENERS ────────────────────────────────────────
+  // ─── BOTTOM BAR ──────────────────────────────────────────────────
   const bottomInput = document.getElementById('bottom-bar-input');
   const bottomBtn   = document.getElementById('bottom-bar-btn');
 
@@ -1232,11 +1726,32 @@
     }
   });
 
-  // ─── CLEAR ──────────────────────────────────────────────────────
+  // ─── SEARCH ──────────────────────────────────────────────────────
+  const searchInput = document.getElementById('search-input');
+  const searchClear = document.getElementById('search-clear');
+
+  searchInput.addEventListener('input', () => {
+    const val = searchInput.value;
+    if (val) {
+      searchClear.classList.add('visible');
+    } else {
+      searchClear.classList.remove('visible');
+    }
+    render();
+  });
+
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchClear.classList.remove('visible');
+    render();
+    searchInput.focus();
+  });
+
+  // ─── CLEAR VALUES ────────────────────────────────────────────────
   const confirmOverlay = document.getElementById('confirm-overlay');
 
-  document.getElementById('btn-clear').addEventListener('click', () => {
-    confirmOverlay.classList.add('open');
+  confirmOverlay.addEventListener('click', e => {
+    if (e.target === confirmOverlay) confirmOverlay.classList.remove('open');
   });
 
   document.getElementById('btn-cancel-clear').addEventListener('click', () => {
@@ -1250,48 +1765,30 @@
     render();
   });
 
-  confirmOverlay.addEventListener('click', e => {
-    if (e.target === confirmOverlay) confirmOverlay.classList.remove('open');
-  });
+  // ─── DELETE CONFIRM MODAL ────────────────────────────────────────
+  const deleteOverlay = document.getElementById('delete-confirm-overlay');
+  let pendingDeleteId = null;
 
-  // ─── ADD CATEGORY MODAL ─────────────────────────────────────────
-  const overlay = document.getElementById('modal-overlay');
-  const inpCatName = document.getElementById('inp-cat-name');
-
-  document.getElementById('fab').addEventListener('click', () => {
-    inpCatName.value = '';
-    overlay.classList.add('open');
-    setTimeout(() => inpCatName.focus(), 300);
-  });
-
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
-
-  document.getElementById('btn-add-category').addEventListener('click', () => {
-    const name = inpCatName.value.trim();
-    if (!name) {
-      inpCatName.focus();
-      inpCatName.style.borderColor = '#ef4444';
-      setTimeout(() => inpCatName.style.borderColor = '', 1500);
-      return;
+  deleteOverlay.addEventListener('click', e => {
+    if (e.target === deleteOverlay) {
+      deleteOverlay.classList.remove('open');
+      pendingDeleteId = null;
     }
-
-    const catId = genId('cat');
-    state.categories.push({ id: catId, name, collapsed: false });
-    saveState();
-    overlay.classList.remove('open');
-    render();
-
-    // scroll to new category
-    setTimeout(() => {
-      const el = root.querySelector(`.category[data-cat-id="${catId}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
   });
 
-  inpCatName.addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('btn-add-category').click();
+  document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+    deleteOverlay.classList.remove('open');
+    pendingDeleteId = null;
+  });
+
+  document.getElementById('btn-confirm-delete').addEventListener('click', () => {
+    deleteOverlay.classList.remove('open');
+    if (pendingDeleteId !== null) {
+      state.products = state.products.filter(p => p.id !== pendingDeleteId);
+      saveState();
+      render();
+      pendingDeleteId = null;
+    }
   });
 
   // ─── INIT ────────────────────────────────────────────────────────
