@@ -82,20 +82,20 @@
     /* ── SEARCH BAR ── */
     #search-bar {
       position: fixed;
-      bottom: 0;
+      top: var(--header-h);
       left: 0; right: 0;
-      background: #1a2e1e;
-      box-shadow: 0 -2px 16px rgba(0,0,0,.35);
+      height: var(--search-h);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      padding: 10px 14px;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-      gap: 10px;
-      z-index: 200;
+      padding: 0 12px;
+      gap: 8px;
+      z-index: 99;
     }
 
     #search-bar .search-icon {
-      color: #aaa;
+      color: var(--text-muted);
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -103,35 +103,36 @@
 
     #search-input {
       flex: 1;
-      height: 48px;
-      border: 1.5px solid #3a5a3a;
-      border-radius: 14px;
-      padding: 0 16px;
-      font-size: 16px;
+      height: 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 15px;
       font-family: inherit;
-      color: #fff;
-      background: #2d2d2d;
+      color: var(--text);
+      background: #f4f4f5;
       outline: none;
       -webkit-appearance: none;
       transition: border-color .15s, box-shadow .15s;
     }
 
-    #search-input::placeholder { color: #888; }
+    #search-input::placeholder { color: var(--text-muted); }
 
     #search-input:focus {
       border-color: var(--green-mid);
-      box-shadow: 0 0 0 3px rgba(82,183,136,.25);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(82,183,136,.15);
     }
 
     #search-clear {
       display: none;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       border: none;
-      background: #3a3a3a;
-      color: #aaa;
-      font-size: 18px;
+      background: #e4e4e7;
+      color: var(--text-muted);
+      font-size: 16px;
       cursor: pointer;
       align-items: center;
       justify-content: center;
@@ -142,8 +143,8 @@
 
     /* ── MAIN CONTENT ── */
     main {
-      padding-top: var(--header-h);
-      padding-bottom: calc(var(--search-h) + env(safe-area-inset-bottom, 0px) + 16px);
+      padding-top: calc(var(--header-h) + var(--search-h));
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
     }
 
     /* ── CATEGORY ── */
@@ -1712,34 +1713,6 @@
     searchClear.classList.remove('visible');
     render();
     searchInput.focus();
-  });
-
-  // ─── KEYBOARD / VIEWPORT FIX ─────────────────────────────────────
-  // When the soft keyboard opens on mobile, reposition the search bar
-  // above the keyboard using the visualViewport API.
-  const searchBar = document.getElementById('search-bar');
-
-  function repositionSearchBar() {
-    if (!window.visualViewport) return;
-    const keyboardHeight = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-    const offset = Math.max(0, keyboardHeight);
-    searchBar.style.bottom = offset + 'px';
-    document.querySelector('main').style.paddingBottom = (searchBar.offsetHeight + offset + 16) + 'px';
-  }
-
-  function resetSearchBar() {
-    searchBar.style.bottom = '';
-    document.querySelector('main').style.paddingBottom = '';
-  }
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', repositionSearchBar);
-    window.visualViewport.addEventListener('scroll', repositionSearchBar);
-  }
-
-  searchInput.addEventListener('blur', () => {
-    // Small delay so the keyboard animation finishes before resetting
-    setTimeout(resetSearchBar, 100);
   });
 
   // ─── CLEAR VALUES ────────────────────────────────────────────────
