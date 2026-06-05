@@ -1714,6 +1714,34 @@
     searchInput.focus();
   });
 
+  // ─── KEYBOARD / VIEWPORT FIX ─────────────────────────────────────
+  // When the soft keyboard opens on mobile, reposition the search bar
+  // above the keyboard using the visualViewport API.
+  const searchBar = document.getElementById('search-bar');
+
+  function repositionSearchBar() {
+    if (!window.visualViewport) return;
+    const keyboardHeight = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+    const offset = Math.max(0, keyboardHeight);
+    searchBar.style.bottom = offset + 'px';
+    document.querySelector('main').style.paddingBottom = (searchBar.offsetHeight + offset + 16) + 'px';
+  }
+
+  function resetSearchBar() {
+    searchBar.style.bottom = '';
+    document.querySelector('main').style.paddingBottom = '';
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', repositionSearchBar);
+    window.visualViewport.addEventListener('scroll', repositionSearchBar);
+  }
+
+  searchInput.addEventListener('blur', () => {
+    // Small delay so the keyboard animation finishes before resetting
+    setTimeout(resetSearchBar, 100);
+  });
+
   // ─── CLEAR VALUES ────────────────────────────────────────────────
   const confirmOverlay = document.getElementById('confirm-overlay');
 
