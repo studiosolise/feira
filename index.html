@@ -20,7 +20,7 @@
       --checked-bg: #f0f0f0;
       --checked-text: #aaaaaa;
       --header-h: 72px;
-      --search-h: 52px;
+      --search-h: 68px;
     }
 
     html, body {
@@ -78,20 +78,20 @@
     /* ── SEARCH BAR ── */
     #search-bar {
       position: fixed;
-      top: var(--header-h);
+      bottom: 0;
       left: 0; right: 0;
-      height: var(--search-h);
-      background: #fff;
-      border-bottom: 1px solid var(--border);
+      background: #1a2e1e;
+      box-shadow: 0 -2px 16px rgba(0,0,0,.35);
       display: flex;
       align-items: center;
-      padding: 0 12px;
-      gap: 8px;
-      z-index: 99;
+      padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      gap: 10px;
+      z-index: 200;
     }
 
     #search-bar .search-icon {
-      color: var(--text-muted);
+      color: #aaa;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -99,27 +99,35 @@
 
     #search-input {
       flex: 1;
-      height: 36px;
-      border: none;
-      background: transparent;
-      font-size: 15px;
+      height: 48px;
+      border: 1.5px solid #3a5a3a;
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 16px;
       font-family: inherit;
-      color: var(--text);
+      color: #fff;
+      background: #2d2d2d;
       outline: none;
       -webkit-appearance: none;
+      transition: border-color .15s, box-shadow .15s;
     }
 
-    #search-input::placeholder { color: var(--text-muted); }
+    #search-input::placeholder { color: #888; }
+
+    #search-input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(82,183,136,.25);
+    }
 
     #search-clear {
       display: none;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       border: none;
-      background: #e4e4e7;
-      color: var(--text-muted);
-      font-size: 16px;
+      background: #3a3a3a;
+      color: #aaa;
+      font-size: 18px;
       cursor: pointer;
       align-items: center;
       justify-content: center;
@@ -130,8 +138,8 @@
 
     /* ── MAIN CONTENT ── */
     main {
-      padding-top: calc(var(--header-h) + var(--search-h));
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 48px);
+      padding-top: var(--header-h);
+      padding-bottom: calc(var(--search-h) + env(safe-area-inset-bottom, 0px) + 16px);
     }
 
     /* ── CATEGORY ── */
@@ -221,8 +229,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 20px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .5px;
       pointer-events: none;
       opacity: 0;
       transition: opacity .15s;
@@ -299,21 +309,6 @@
     }
 
     .input-wrap { position: relative; }
-
-    .input-label {
-      position: absolute;
-      top: -9px;
-      left: 8px;
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: #fff;
-      padding: 0 3px;
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    .item.checked .input-label { background: var(--checked-bg); }
 
     /* ── CONFIRM MODAL ── */
     .confirm-overlay {
@@ -795,7 +790,6 @@
             <span class="name-text" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</span>
           </div>
           <div class="input-wrap">
-            <span class="input-label">Qtd</span>
             <input
               type="text"
               inputmode="decimal"
@@ -807,7 +801,6 @@
             />
           </div>
           <div class="input-wrap">
-            <span class="input-label">Preço R$</span>
             <input
               type="text"
               inputmode="numeric"
